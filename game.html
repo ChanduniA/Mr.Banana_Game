@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Memory Game</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+
+<div class="title-box">
+<img src="logo.png">
+<h1>Mr. Banana</h1>
+</div>
+
+<h2 id="welcomeText"></h2>
+
+<div class="level-box" id="levelBox">
+
+<h2>Choose Your Level</h2>
+
+<button class="levelBtn" onclick="startGame('easy')">Easy</button>
+
+<button class="levelBtn" onclick="startGame('intermediate')">Intermediate</button>
+
+<button class="levelBtn" onclick="startGame('hard')">Hard</button>
+
+</div>
+
+<div id="gameBoard"></div>
+
+<div id="scoreBox" style="display:none">
+Score: <span id="score">0</span>
+</div>
+
+<div id="gameButtons" style="display:none">
+
+<button onclick="restartGame()">Restart</button>
+<button onclick="goBack()">Back</button>
+
+</div>
+
+<button class="logout" onclick="logout()">Logout</button>
+
+<script>
+
+/* SAME GAME CODE AS YOUR ORIGINAL */
+
+let score=0
+let level=""
+let first=null
+let second=null
+let lock=false
+let matches=0
+let allowPenalty=false
+
+let emojis=["🐵","🍌","🐒","🌴","🥥","🍍","🐯","🦁","🐸","🐼","🐨","🐰","🐻","🐧","🦊"]
+
+let player=localStorage.getItem("currentPlayer")
+document.getElementById("welcomeText").innerText="Welcome "+player
+
+function startGame(lvl){
+
+level=lvl
+score=0
+matches=0
+allowPenalty=false
+
+document.getElementById("score").innerText=score
+
+document.getElementById("gameButtons").style.display="block"
+document.getElementById("scoreBox").style.display="block"
+document.getElementById("levelBox").style.display="none"
+
+let board=document.getElementById("gameBoard")
+board.innerHTML=""
+board.className=lvl
+
+let pairs
+
+if(lvl=="easy") pairs=8
+if(lvl=="intermediate") pairs=10
+if(lvl=="hard") pairs=15
+
+let cards=emojis.slice(0,pairs)
+cards=[...cards,...cards]
+
+cards.sort(()=>0.5-Math.random())
+
+cards.forEach(symbol=>{
+
+let card=document.createElement("div")
+card.className="card"
+
+card.innerHTML=`
+<div class="card-inner">
+<div class="card-front">?</div>
+<div class="card-back">${symbol}</div>
+</div>
+`
+
+card.dataset.symbol=symbol
+
+card.onclick=()=>flip(card)
+
+board.appendChild(card)
+
+})
+
+}
+
+/* rest unchanged */
+
+function flip(card){
+
+if(lock) return
+if(card.classList.contains("flip")) return
+
+card.classList.add("flip")
+
+if(!first){
+first=card
+return
+}
+
+second=card
+lock=true
+
+if(first.dataset.symbol==second.dataset.symbol){
+
+score+=10
+matches++
+
+allowPenalty=true
+
+reset()
+
+if(matches==document.querySelectorAll(".card").length/2){
+showWin()
+}
+
+}else{
+
+if(allowPenalty) score-=2
+
+setTimeout(()=>{
+first.classList.remove("flip")
+second.classList.remove("flip")
+reset()
+},800)
+
+}
+
+document.getElementById("score").innerText=score
+}
+
+function reset(){
+first=null
+second=null
+lock=false
+}
+
+function showWin(){
+
+let popup=document.createElement("div")
+popup.className="win-popup"
+
+popup.innerHTML=`
+<div class="win-box">
+🎉 YOU WON! 🎉<br><br>
+<button onclick="startBanana()">Continue</button>
+</div>
+`
+
+document.body.appendChild(popup)
+
+}
+
+function startBanana(){
+
+localStorage.setItem("bananaLevel",level)
+
+window.location="banana.html"
+
+}
+
+function restartGame(){
+startGame(level)
+}
+
+function goBack(){
+location.reload()
+}
+
+function logout(){
+window.location="index.html"
+}
+
+</script>
+
+</body>
+</html>

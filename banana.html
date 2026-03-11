@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Banana Puzzle</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+
+<div class="title-box">
+<img src="logo.png">
+<h1>Mr. Banana</h1>
+</div>
+
+<h2>🍌 Banana Arithmetic Challenge</h2>
+
+<div id="timer"></div>
+
+<div id="puzzleArea"></div>
+
+<br>
+
+<input type="number" id="answer" placeholder="Enter the answer">
+
+<br><br>
+
+<button onclick="checkAnswer()">Submit</button>
+<button onclick="goBack()">Back</button>
+
+<h3>Score: <span id="bananaScore">0</span></h3>
+
+<p id="message"></p>
+
+<button class="logout" onclick="logout()">Logout</button>
+
+<script>
+
+let solution=0
+let score=0
+let time=0
+
+let level=localStorage.getItem("bananaLevel")
+
+if(level=="easy") time=100
+if(level=="intermediate") time=75
+if(level=="hard") time=50
+
+document.getElementById("timer").innerText="Time: "+time+"s"
+
+let timer=setInterval(()=>{
+
+time--
+
+document.getElementById("timer").innerText="Time: "+time+"s"
+
+if(time<=0){
+
+clearInterval(timer)
+
+Swal.fire({
+icon:"warning",
+title:"⏰ Time's Up!",
+text:"Your Score: "+score,
+confirmButtonColor:"#ff7a00"
+}).then(()=>{
+window.location="game.html"
+})
+
+}
+
+},1000)
+
+function loadPuzzle(){
+
+fetch("https://marcconrad.com/uob/banana/api.php")
+
+.then(res=>res.json())
+
+.then(data=>{
+
+solution=data.solution
+
+document.getElementById("puzzleArea").innerHTML=
+`<img src="${data.question}" width="420">`
+
+})
+
+}
+
+function checkAnswer(){
+
+let user=document.getElementById("answer").value
+
+if(user==solution){
+
+score+=10
+
+document.getElementById("bananaScore").innerText=score
+
+document.getElementById("message").innerHTML="<span class='correct'>Correct!</span>"
+
+document.getElementById("answer").value=""
+
+loadPuzzle()
+
+}else{
+
+document.getElementById("message").innerHTML="<span class='wrong'>Try Again!</span>"
+
+}
+
+}
+
+function goBack(){
+window.location="game.html"
+}
+
+function logout(){
+window.location="index.html"
+}
+
+loadPuzzle()
+
+</script>
+
+</body>
+</html>
