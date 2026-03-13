@@ -14,32 +14,35 @@
 <h1>Mr. Banana</h1>
 </div>
 
-<h2>🍌 Banana Arithmetic Challenge</h2>
-
-<div id="timer"></div>
+<h2 class="titleHighlight">Banana Arithmetic Challenge 🍌 </h2>
+<br>
+<br>
+<div id="timer" class="timerHighlight"></div>
 
 <div id="puzzleArea"></div>
 
-<br>
-
-<input type="number" id="answer" placeholder="Enter the answer">
+<input type="number" id="answer" class="answerBox" placeholder="Enter your answer">
 
 <br><br>
 
 <button onclick="checkAnswer()">Submit</button>
-<button onclick="goBack()">Back</button>
+<button class="backBtn" onclick="goBack()">Back</button>
 
-<h3>Score: <span id="bananaScore">0</span></h3>
+<br><br>
+
+<button class="scoreButton">Score: <span id="bananaScore">0</span></button>
 
 <p id="message"></p>
 
+<div class="logoutBox">
 <button class="logout" onclick="logout()">Logout</button>
+</div>
 
 <script>
 
 let solution=0
 let score=0
-let time=0
+let time=60
 
 let level=localStorage.getItem("bananaLevel")
 
@@ -59,13 +62,26 @@ if(time<=0){
 
 clearInterval(timer)
 
+saveScore()
+
 Swal.fire({
-icon:"warning",
-title:"⏰ Time's Up!",
-text:"Your Score: "+score,
-confirmButtonColor:"#ff7a00"
-}).then(()=>{
+
+title:"⏰ Time Up!",
+html:"Your Score: "+score,
+showCancelButton:true,
+confirmButtonText:"Leaderboard",
+cancelButtonText:"Back",
+confirmButtonColor:"#e91e63",
+cancelButtonColor:"#1976d2"
+
+}).then((result)=>{
+
+if(result.isConfirmed){
+window.location="leaderboard.html"
+}else{
 window.location="game.html"
+}
+
 })
 
 }
@@ -75,7 +91,6 @@ window.location="game.html"
 function loadPuzzle(){
 
 fetch("https://marcconrad.com/uob/banana/api.php")
-
 .then(res=>res.json())
 
 .then(data=>{
@@ -83,7 +98,7 @@ fetch("https://marcconrad.com/uob/banana/api.php")
 solution=data.solution
 
 document.getElementById("puzzleArea").innerHTML=
-`<img src="${data.question}" width="420">`
+`<img src="${data.question}" width="380">`
 
 })
 
@@ -99,17 +114,36 @@ score+=10
 
 document.getElementById("bananaScore").innerText=score
 
-document.getElementById("message").innerHTML="<span class='correct'>Correct!</span>"
+document.getElementById("message").innerHTML="<span class='correctMsg'>✔ Correct</span>"
 
 document.getElementById("answer").value=""
 
-loadPuzzle()
+setTimeout(loadPuzzle,600)
 
 }else{
 
-document.getElementById("message").innerHTML="<span class='wrong'>Try Again!</span>"
+document.getElementById("message").innerHTML="<span class='wrongMsg'>✖ Try Again</span>"
+
+document.getElementById("answer").value=""
 
 }
+
+}
+
+function saveScore(){
+
+let player=localStorage.getItem("currentPlayer")
+let flipScore=localStorage.getItem("flipScore")
+
+let leaderboard=JSON.parse(localStorage.getItem("leaderboard")) || []
+
+leaderboard.push({
+name:player,
+flip:Number(flipScore),
+banana:Number(score)
+})
+
+localStorage.setItem("leaderboard",JSON.stringify(leaderboard))
 
 }
 

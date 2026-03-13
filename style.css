@@ -1,3 +1,5 @@
+/* GENERAL */
+
 body{
 font-family:Arial,sans-serif;
 text-align:center;
@@ -15,13 +17,7 @@ display:flex;
 align-items:center;
 justify-content:center;
 gap:20px;
-width:420px;
-margin:30px auto;
-padding:18px 40px;
-border-radius:40px;
-background:rgba(255,255,255,0.25);
-backdrop-filter:blur(10px);
-box-shadow:0 8px 25px rgba(0,0,0,0.25);
+margin:25px auto;
 }
 
 .title-box img{
@@ -30,7 +26,7 @@ height:90px;
 }
 
 .title-box h1{
-color:#ff7a00;
+color:#6b3e26;
 font-size:36px;
 margin:0;
 }
@@ -54,17 +50,6 @@ border-radius:6px;
 border:1px solid #ccc;
 }
 
-/* LEVEL BOX */
-
-.level-box{
-background:white;
-width:320px;
-margin:60px auto;
-padding:30px;
-border-radius:15px;
-box-shadow:0 4px 10px rgba(0,0,0,0.2);
-}
-
 /* BUTTONS */
 
 button{
@@ -79,26 +64,87 @@ font-weight:bold;
 }
 
 button:hover{
+transform:scale(1.05);
 background:#ff9800;
+}
+
+.restartBtn{
+background:#fbc02d;
+color:black;
+}
+
+.backBtn{
+background:#1976d2;
+}
+
+.logout{
+background:#e53935;
+}
+
+.continueBtn{
+background:#8e24aa;
+}
+
+/* WELCOME */
+
+.welcome{
+font-size:28px;
+color:#ff7a00;
+}
+
+/* LEVEL BOX */
+
+.level-box{
+background:white;
+width:340px;
+margin:40px auto;
+padding:40px;
+border-radius:20px;
+box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+
+.levelBtn{
+width:80%;
+display:block;
+margin:12px auto;
+font-size:18px;
+}
+
+/* LOGOUT */
+
+.logoutBox{
+width:100%;
+display:flex;
+justify-content:flex-end;
+padding-right:80px;
+margin-top:10px;
+}
+
+/* LEVEL TITLE */
+
+.levelTitleHighlight{
+background:#fff3cd;
+color:#ff7a00;
+padding:10px 25px;
+border-radius:20px;
+display:inline-block;
+font-size:26px;
+margin-top:15px;
 }
 
 /* GAME BOARD */
 
 #gameBoard{
 display:grid;
+gap:10px;
 justify-content:center;
-gap:12px;
-margin-top:30px;
+margin-top:20px;
 }
 
-.easy{grid-template-columns:repeat(4,90px);}
-.intermediate{grid-template-columns:repeat(5,90px);}
-.hard{grid-template-columns:repeat(6,90px);}
-
-/* CARD */
+/* CARDS */
 
 .card{
-width:90px;
+width:80px;
 height:90px;
 perspective:1000px;
 cursor:pointer;
@@ -109,35 +155,159 @@ width:100%;
 height:100%;
 position:relative;
 transform-style:preserve-3d;
-transition:transform 0.6s;
+transition:transform 0.5s;
 }
 
 .card.flip .card-inner{
 transform:rotateY(180deg);
 }
 
-.card-front,.card-back{
+.card-front,
+.card-back{
 position:absolute;
 width:100%;
 height:100%;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:35px;
+font-size:32px;
 border-radius:10px;
 backface-visibility:hidden;
-box-shadow:0 4px 8px rgba(0,0,0,0.2);
 }
 
-.card-front{background:#ffd54f;}
-.card-back{background:white;transform:rotateY(180deg);}
+.card-front{
+background:#ffd54f;
+}
+
+.card-back{
+background:white;
+transform:rotateY(180deg);
+}
 
 /* SCORE */
 
-#scoreBox{
-margin-top:20px;
+.scoreButton{
+background:#2e7d32;
+color:white;
+padding:10px 25px;
+border-radius:25px;
 font-size:20px;
+margin-top:20px;
+}
+
+/* BANANA TITLE */
+
+.bananaTitle{
+color:#ff7a00;
+font-size:32px;
 font-weight:bold;
+}
+
+/* TIMER */
+
+.timerHighlight{
+background:#e53935;
+color:white;
+padding:10px 20px;
+border-radius:20px;
+display:inline-block;
+margin-top:10px;
+}
+
+/* ANSWER */
+
+.answerBox{
+width:220px;
+padding:12px;
+font-size:18px;
+border-radius:10px;
+border:2px solid #ff7a00;
+}
+
+/* MESSAGE */
+
+.correctMsg{
+background:#4caf50;
+color:white;
+padding:8px 15px;
+border-radius:15px;
+}
+
+.wrongMsg{
+background:#e53935;
+color:white;
+padding:8px 15px;
+border-radius:15px;
+}
+
+/* LEADERBOARD */
+
+.leaderboardBox{
+width:600px;
+margin:40px auto;
+background:white;
+padding:30px;
+border-radius:15px;
+}
+
+.leaderboardTable{
+width:100%;
+border-collapse:collapse;
+}
+
+.leaderboardTable th{
+background:#ff9800;
+color:white;
+padding:10px;
+}
+
+.leaderboardTable td{
+padding:10px;
+border-bottom:1px solid #ddd;
+}
+
+/* GAME TITLE HIGHLIGHT */
+
+.title-box{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:20px;
+background:white;
+padding:15px 40px;
+border-radius:20px;
+width:fit-content;
+margin:20px auto;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+.title-box img{
+width:80px;
+height:80px;
+}
+
+.title-box h1{
+font-size:36px;
+color:#ff7a00;
+margin:0;
+}
+
+/* WELCOME HIGHLIGHT */
+
+.welcome{
+background:#fff3cd;
+padding:10px 25px;
+border-radius:20px;
+display:inline-block;
+font-size:22px;
+margin-top:10px;
+}
+
+/* FLIP CARD HOVER */
+
+.card:hover{
+transform:scale(1.08);
+transition:0.3s;
 }
 
 /* WIN POPUP */
@@ -158,49 +328,38 @@ justify-content:center;
 background:white;
 padding:40px;
 border-radius:20px;
-font-size:26px;
-color:#ff7a00;
+font-size:28px;
+text-align:center;
+box-shadow:0 10px 25px rgba(0,0,0,0.4);
 }
 
-/* TIMER */
-
-#timer{
-font-size:22px;
-font-weight:bold;
-margin-top:10px;
-}
-
-.correct{
-color:green;
-font-weight:bold;
-}
-
-.wrong{
-color:red;
-font-weight:bold;
-}
-
-/* LOGOUT */
-
-.logout{
-position:fixed;
-bottom:20px;
-right:20px;
-background:#e53935;
-}
-
-.levelBtn{
-width:80%;
-display:block;
-margin:15px auto;
+.win-box button{
+margin-top:20px;
+padding:12px 25px;
 font-size:18px;
+background:#ff9800;
+color:white;
+border:none;
+border-radius:10px;
+cursor:pointer;
 }
 
-.level-box{
+.win-box button:hover{
+background:#ff7a00;
+}
+
+/* =========================
+TITLE HIGHLIGHT
+========================= */
+
+.titleHighlight{
 background:white;
-width:340px;
-margin:60px auto;
-padding:40px;
-border-radius:20px;
-box-shadow:0 10px 25px rgba(0,0,0,0.3);
+color:#ff7a00;
+padding:12px 30px;
+border-radius:25px;
+display:inline-block;
+font-size:28px;
+font-weight:bold;
+margin-top:15px;
+box-shadow:0 6px 15px rgba(0,0,0,0.2);
 }

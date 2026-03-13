@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Leaderboard</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="title-box">
+<img src="logo.png">
+<h1>Mr. Banana</h1>
+</div>
+
+<h2 class="titleHighlight">Leaderboard 🏆 </h2>
+
+<div class="leaderboardBox">
+
+<table class="leaderboardTable" id="table">
+
+<tr>
+<th>Rank</th>
+<th>Player</th>
+<th>Flip</th>
+<th>Banana</th>
+<th>Total</th>
+</tr>
+
+</table>
+
+</div>
+
+<br>
+
+<button class="backBtn" onclick="goBack()">Back</button>
+
+<script>
+
+let scores=JSON.parse(localStorage.getItem("leaderboard")) || []
+
+scores=scores.filter(p=>p.name && !isNaN(p.flip) && !isNaN(p.banana))
+
+scores.forEach(p=>{
+p.total=p.flip+p.banana
+})
+
+scores.sort((a,b)=>b.total-a.total)
+
+let table=document.getElementById("table")
+
+scores.forEach((player,index)=>{
+
+let row=table.insertRow()
+
+row.insertCell(0).innerText=index+1
+row.insertCell(1).innerText=player.name
+row.insertCell(2).innerText=player.flip
+row.insertCell(3).innerText=player.banana
+row.insertCell(4).innerText=player.total
+
+})
+
+function goBack(){
+window.location="game.html"
+}
+
+</script>
+
+</body>
+</html>
