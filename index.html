@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr. Banana Memory Game</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+    <div class="background-overlay"></div>
+
+    <header class="app-header">
+        <img src="logo.png" alt="Mr. Banana Logo" class="logo">
+        <h1 class="highlight-title">Mr. Banana</h1>
+    </header>
+
+    <main id="app-container">
+        
+        <!-- LOGIN / REGISTER VIEW -->
+        <section id="view-auth" class="view active">
+            <div class="glass-panel text-center">
+                <h2 id="auth-title">Welcome to the Game</h2>
+                <p id="auth-subtitle">Please enter your name to start playing!</p>
+                
+                <form id="auth-form" class="auth-form">
+                    <div class="input-group">
+                        <input type="email" id="player-email-input" placeholder="Enter your email" required class="hidden" style="margin-bottom: 15px;">
+                        <input type="text" id="player-name-input" placeholder="Enter your name" required autocomplete="off">
+                        <input type="password" id="player-password-input" placeholder="Enter your password" required style="margin-top: 15px;">
+                    </div>
+                    <div class="action-buttons">
+                        <button type="submit" class="btn primary-btn" id="main-auth-btn">Login</button>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <span id="auth-toggle-text" class="auth-toggle-badge">No account? Register here</span>
+                    </div>
+                </form>
+                <div id="auth-message" class="message hidden">Account created! You can now login.</div>
+            </div>
+        </section>
+
+        <!-- OTP VERIFICATION VIEW -->
+        <section id="view-otp" class="view hidden">
+            <div class="glass-panel text-center">
+                <h2>2-Factor Auth</h2>
+                <p>We've sent a 4-digit OTP to your email!</p>
+                <div class="otp-inputs" style="display: flex; gap: 10px; justify-content: center; margin-bottom: 25px;">
+                    <input type="text" class="otp-box" maxlength="1" id="otp1">
+                    <input type="text" class="otp-box" maxlength="1" id="otp2">
+                    <input type="text" class="otp-box" maxlength="1" id="otp3">
+                    <input type="text" class="otp-box" maxlength="1" id="otp4">
+                </div>
+                <div class="action-buttons">
+                    <button class="btn primary-btn" id="verify-otp-btn">Verify</button>
+                    <button class="btn secondary-btn" id="cancel-otp-btn">Cancel</button>
+                </div>
+                <div id="otp-message" class="message hidden" style="color: var(--danger-color); background: rgba(255, 77, 77, 0.2); border-color: var(--danger-color);">Invalid Code.</div>
+            </div>
+        </section>
+
+        <!-- LEVEL SELECTION VIEW -->
+        <section id="view-level" class="view hidden">
+            <div class="glass-panel text-center">
+                <h2 id="welcome-message" class="highlight-title" style="color: orange; white-space: nowrap; width: 100%; font-size: clamp(1rem, 4.5vw, 1.8rem);">Welcome [Player]</h2>
+                <p class="highlight-title" style="font-size: 1.5rem; margin-bottom: 20px;">Choose your level</p>
+                
+                <div class="level-buttons">
+                    <button class="btn level-btn" data-level="easy">
+                        <span class="btn-title">Easy</span>
+                    </button>
+                    <button class="btn level-btn" data-level="medium">
+                        <span class="btn-title">Medium</span>
+                    </button>
+                    <button class="btn level-btn" data-level="hard">
+                        <span class="btn-title">Hard</span>
+                    </button>
+                </div>
+                <!-- Adding Logout Button here -->
+                <button id="level-logout-btn" class="btn danger-btn" style="margin-top: 25px;">Logout</button>
+            </div>
+        </section>
+
+        <!-- GAME VIEW -->
+        <section id="view-game" class="view hidden">
+            <div class="game-header">
+                <h2 id="level-indicator" style="color: orange;">Level : Easy</h2>
+                <div class="score-board">
+                    <span>Score: </span>
+                    <span id="score-display">0</span>
+                </div>
+            </div>
+
+            <div class="game-board-container">
+                <div id="card-grid" class="card-grid">
+                    <!-- Cards injected via JS -->
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <div class="left-controls">
+                    <button id="restart-btn" class="btn control-btn">Restart</button>
+                    <button id="back-btn" class="btn control-btn" style="background-color: lightblue; border-color: lightblue; color: darkblue;">Back</button>
+                </div>
+                <div class="right-controls">
+                    <button id="logout-btn" class="btn control-btn danger-btn">Logout</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Win Modal Popup -->
+    <div id="win-modal" class="modal-overlay hidden">
+        <div class="glass-panel text-center popup-content">
+            <h2 class="highlight-title popup-title">CONGRATULATIONS!</h2>
+            <p id="win-message" class="popup-text">You completed the level.</p>
+            <button id="win-ok-btn" class="btn primary-btn btn-large">OK</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
