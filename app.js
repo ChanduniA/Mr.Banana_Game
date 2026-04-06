@@ -1,14 +1,14 @@
 // Game Data & Config
 // Initialize EmailJS
-emailjs.init("9aFPTaOhbGmm7VsOJ");
+emailjs.init("TR8mvTaOb-IbCfdcT");
 
 const mockUsers = {}; // Mock DB to store user: { pass, email }
 const FRUITS = ['🍌', '🍎', '🍊', '🍇', '🍓', '🍉', '🍍', '🍒', '🍑', '🥭', '🥝', '🥥', '🍋', '🍐', '🍈'];
 
 const LEVELS = {
-    easy: { pairs: 8, rows: 4, cols: 4, label: 'Easy' },
-    medium: { pairs: 10, rows: 4, cols: 5, label: 'Medium' },
-    hard: { pairs: 15, rows: 5, cols: 6, label: 'Hard' }
+    easy: { pairs: 8, rows: 4, cols: 4, label: 'Easy', title: "You are now a proud Junior Banana!", desc: "Great Start, Keep Going!" },
+    medium: { pairs: 10, rows: 4, cols: 5, label: 'Medium', title: "You've mastered the path of a Senior Banana!", desc: "Great Progress, Keep Climbing!" },
+    hard: { pairs: 15, rows: 5, cols: 6, label: 'Hard', title: "You are now the Legendary Professor Banana!", desc: "Ultimate Achievement, You're a True Master!" }
 };
 
 // Application State
@@ -167,7 +167,7 @@ function handleAuth() {
                 to_name: name
             };
 
-            emailjs.send('service_3ictkbf', 'template_dta74ax', templateParams)
+            emailjs.send('service_hkoai68', 'template_aifkfos', templateParams)
                 .then(function(response) {
                     console.log('SUCCESS!', response.status, response.text);
                     // Show OTP View
@@ -189,7 +189,7 @@ function handleAuth() {
                 });
 
         } else {
-            dom.authMessage.textContent = "Invalid username or password!";
+            dom.authMessage.textContent = "invalid login";
             dom.authMessage.style.color = "var(--danger-color)";
             dom.authMessage.classList.remove('hidden');
             setTimeout(() => dom.authMessage.classList.add('hidden'), 2000);
@@ -343,7 +343,10 @@ function disableCards() {
     // Check for win
     if (state.matchedPairs === state.currentLevel.pairs) {
         setTimeout(() => {
-            dom.winMessage.innerHTML = `You Completed the ${state.currentLevel.label} Level<br><span style="margin-top: 10px; display: inline-block;">Score : ${state.score}</span>`;
+            dom.winMessage.innerHTML = `${state.currentLevel.title}<br>
+            <span style="margin-top: 15px; display: inline-block; font-size: 1.3rem; color: var(--primary-color); font-weight: bold;">Score : ${state.score}</span><br>
+            <span style="font-size: 1.1rem; opacity: 0.9; display: inline-block; margin-bottom: 20px;">${state.currentLevel.desc}</span><br>
+            <span style="font-size: 1.2rem; font-weight: bold; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px; display: block;">Ready for the Next Challenge?</span>`;
             dom.winModal.classList.remove('hidden');
         }, 500);
     }

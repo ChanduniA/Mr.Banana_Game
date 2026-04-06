@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
+
 <body>
     <div class="background-overlay"></div>
 
@@ -17,18 +19,20 @@
     </header>
 
     <main id="app-container">
-        
+
         <!-- LOGIN / REGISTER VIEW -->
         <section id="view-auth" class="view active">
             <div class="glass-panel text-center">
                 <h2 id="auth-title">Welcome to the Game</h2>
                 <p id="auth-subtitle">Please enter your name to start playing!</p>
-                
+
                 <form id="auth-form" class="auth-form">
                     <div class="input-group">
-                        <input type="email" id="player-email-input" placeholder="Enter your email" required class="hidden" style="margin-bottom: 15px;">
-                        <input type="text" id="player-name-input" placeholder="Enter your name" required autocomplete="off">
-                        <input type="password" id="player-password-input" placeholder="Enter your password" required style="margin-top: 15px;">
+                        <input type="email" id="player-email-input" placeholder="Enter your email" class="hidden"
+                            style="margin-bottom: 15px;">
+                        <input type="text" id="player-name-input" placeholder="Enter your name" autocomplete="off">
+                        <input type="password" id="player-password-input" placeholder="Enter your password"
+                            style="margin-top: 15px;">
                     </div>
                     <div class="action-buttons">
                         <button type="submit" class="btn primary-btn" id="main-auth-btn">Login</button>
@@ -44,7 +48,7 @@
         <!-- OTP VERIFICATION VIEW -->
         <section id="view-otp" class="view hidden">
             <div class="glass-panel text-center">
-                <h2>2-Factor Auth</h2>
+                <h2>Two-Factor Authentication</h2>
                 <p>We've sent a 4-digit OTP to your email!</p>
                 <div class="otp-inputs" style="display: flex; gap: 10px; justify-content: center; margin-bottom: 25px;">
                     <input type="text" class="otp-box" maxlength="1" id="otp1">
@@ -56,25 +60,29 @@
                     <button class="btn primary-btn" id="verify-otp-btn">Verify</button>
                     <button class="btn secondary-btn" id="cancel-otp-btn">Cancel</button>
                 </div>
-                <div id="otp-message" class="message hidden" style="color: var(--danger-color); background: rgba(255, 77, 77, 0.2); border-color: var(--danger-color);">Invalid Code.</div>
+                <div id="otp-message" class="message hidden"
+                    style="color: var(--danger-color); background: rgba(255, 77, 77, 0.2); border-color: var(--danger-color);">
+                    Invalid Code.</div>
             </div>
         </section>
 
         <!-- LEVEL SELECTION VIEW -->
         <section id="view-level" class="view hidden">
             <div class="glass-panel text-center">
-                <h2 id="welcome-message" class="highlight-title" style="color: orange; white-space: nowrap; width: 100%; font-size: clamp(1rem, 4.5vw, 1.8rem);">Welcome [Player]</h2>
+                <h2 id="welcome-message" class="highlight-title"
+                    style="color: orange; white-space: nowrap; width: 100%; font-size: clamp(1rem, 4.5vw, 1.8rem);">
+                    Welcome [Player]</h2>
                 <p class="highlight-title" style="font-size: 1.5rem; margin-bottom: 20px;">Choose your level</p>
-                
+
                 <div class="level-buttons">
                     <button class="btn level-btn" data-level="easy">
-                        <span class="btn-title">Easy</span>
+                        <span class="btn-title">Junior Banana</span>
                     </button>
                     <button class="btn level-btn" data-level="medium">
-                        <span class="btn-title">Medium</span>
+                        <span class="btn-title">Senior Banana</span>
                     </button>
                     <button class="btn level-btn" data-level="hard">
-                        <span class="btn-title">Hard</span>
+                        <span class="btn-title">Professor Banana</span>
                     </button>
                 </div>
                 <!-- Adding Logout Button here -->
@@ -101,7 +109,8 @@
             <div class="game-controls">
                 <div class="left-controls">
                     <button id="restart-btn" class="btn control-btn">Restart</button>
-                    <button id="back-btn" class="btn control-btn" style="background-color: lightblue; border-color: lightblue; color: darkblue;">Back</button>
+                    <button id="back-btn" class="btn control-btn"
+                        style="background-color: lightblue; border-color: lightblue; color: darkblue;">Back</button>
                 </div>
                 <div class="right-controls">
                     <button id="logout-btn" class="btn control-btn danger-btn">Logout</button>
@@ -122,4 +131,5 @@
 
     <script src="app.js"></script>
 </body>
+
 </html>
