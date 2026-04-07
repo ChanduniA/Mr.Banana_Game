@@ -5,6 +5,19 @@ emailjs.init("TR8mvTaOb-IbCfdcT");
 const mockUsers = {}; // Mock DB to store user: { pass, email }
 const FRUITS = ['🍌', '🍎', '🍊', '🍇', '🍓', '🍉', '🍍', '🍒', '🍑', '🥭', '🥝', '🥥', '🍋', '🍐', '🍈'];
 
+// Banana Arithmetic Config
+const BANANA_TIMERS = {
+    easy:   100,
+    medium:  75,
+    hard:    50
+};
+
+const BANANA_LEVEL_LABELS = {
+    easy:   'Junior Banana',
+    medium: 'Senior Banana',
+    hard:   'Professor Banana'
+};
+
 const LEVELS = {
     easy: { pairs: 8, rows: 4, cols: 4, label: 'Easy', title: "You are now a proud Junior Banana!", desc: "Great Start, Keep Going!" },
     medium: { pairs: 10, rows: 4, cols: 5, label: 'Medium', title: "You've mastered the path of a Senior Banana!", desc: "Great Progress, Keep Climbing!" },
@@ -15,6 +28,7 @@ const LEVELS = {
 let state = {
     player: null,
     currentLevel: null,
+    currentLevelKey: null,
     score: 0,
     hasFoundFirstPair: false,
     lockBoard: false,
@@ -24,12 +38,24 @@ let state = {
     expectedOTP: null
 };
 
+// Banana Arithmetic State
+let bananaState = {
+    timeLeft: 100,
+    totalTime: 100,
+    score: 0,
+    puzzlesSolved: 0,
+    currentSolution: null,
+    timerInterval: null,
+    levelKey: null
+};
+
 // DOM Elements
 const views = {
     auth: document.getElementById('view-auth'),
     otp: document.getElementById('view-otp'),
     level: document.getElementById('view-level'),
-    game: document.getElementById('view-game')
+    game: document.getElementById('view-game'),
+    banana: document.getElementById('view-banana')
 };
 
 const dom = {
@@ -67,7 +93,26 @@ const dom = {
     levelLogoutBtn: document.getElementById('level-logout-btn'),
     winModal: document.getElementById('win-modal'),
     winMessage: document.getElementById('win-message'),
-    winOkBtn: document.getElementById('win-ok-btn')
+    winOkBtn: document.getElementById('win-ok-btn'),
+
+    // Banana Arithmetic DOM
+    bananaBackBtn: document.getElementById('banana-back-btn'),
+    bananaLevelLabel: document.getElementById('banana-level-label'),
+    bananaScoreDisplay: document.getElementById('banana-score-display'),
+    bananaTimerDisplay: document.getElementById('banana-timer-display'),
+    timerRingCircle: document.getElementById('timer-ring-circle'),
+    bananaPuzzleImg: document.getElementById('banana-puzzle-img'),
+    puzzleLoading: document.getElementById('puzzle-loading'),
+    bananaAnswerInput: document.getElementById('banana-answer-input'),
+    bananaSubmitBtn: document.getElementById('banana-submit-btn'),
+    bananaFeedbackCorrect: document.getElementById('banana-feedback-correct'),
+    bananaFeedbackWrong: document.getElementById('banana-feedback-wrong'),
+    bananaPuzzlesCount: document.getElementById('banana-puzzles-count'),
+    bananaEndModal: document.getElementById('banana-end-modal'),
+    bananaEndScore: document.getElementById('banana-end-score'),
+    bananaEndPuzzles: document.getElementById('banana-end-puzzles'),
+    bananaPlayAgainBtn: document.getElementById('banana-play-again-btn'),
+    bananaEndBackBtn: document.getElementById('banana-end-back-btn')
 };
 
 // Helper: Switch Views
@@ -245,6 +290,7 @@ dom.levelButtons.forEach(btn => {
 // ----- Game Initialization -----
 function startGame(levelKey) {
     state.currentLevel = LEVELS[levelKey];
+    state.currentLevelKey = levelKey;
     dom.levelIndicator.textContent = `Level : ${state.currentLevel.label}`;
     showView('game');
     initBoard();
@@ -412,5 +458,167 @@ dom.levelLogoutBtn.addEventListener('click', () => {
 
 dom.winOkBtn.addEventListener('click', () => {
     dom.winModal.classList.add('hidden');
+    // Transition to Banana Arithmetic game
+    startBananaGame(state.currentLevelKey);
+});
+
+// ========== BANANA ARITHMETIC GAME ==========
+
+const TIMER_RADIUS = 52; // must match SVG r attribute
+const TIMER_CIRCUMFERENCE = 2 * Math.PI * TIMER_RADIUS;
+
+function setTimerRing(timeLeft, totalTime) {
+    const fraction = timeLeft / totalTime;
+    const offset = TIMER_CIRCUMFERENCE * (1 - fraction);
+    dom.timerRingCircle.style.strokeDashoffset = offset;
+    // Colour shift: green -> yellow -> red
+    if (fraction > 0.5) {
+        dom.timerRingCircle.style.stroke = '#2ecc71';
+    } else if (fraction > 0.25) {
+        dom.timerRingCircle.style.stroke = '#fce205';
+    } else {
+        dom.timerRingCircle.style.stroke = '#ff4d4d';
+    }
+}
+
+function startBananaGame(levelKey) {
+    bananaState.levelKey = levelKey;
+    bananaState.timeLeft = BANANA_TIMERS[levelKey];
+    bananaState.totalTime = BANANA_TIMERS[levelKey];
+    bananaState.score = 0;
+    bananaState.puzzlesSolved = 0;
+    bananaState.currentSolution = null;
+
+    // Update UI labels
+    dom.bananaLevelLabel.textContent = BANANA_LEVEL_LABELS[levelKey];
+    dom.bananaScoreDisplay.textContent = '0';
+    dom.bananaPuzzlesCount.textContent = '0';
+    dom.bananaTimerDisplay.textContent = bananaState.timeLeft;
+    dom.bananaAnswerInput.value = '';
+    dom.bananaFeedbackCorrect.classList.add('hidden');
+    dom.bananaFeedbackWrong.classList.add('hidden');
+    dom.bananaEndModal.classList.add('hidden');
+
+    // Init ring
+    dom.timerRingCircle.style.strokeDasharray = TIMER_CIRCUMFERENCE;
+    setTimerRing(bananaState.timeLeft, bananaState.totalTime);
+
+    showView('banana');
+    fetchBananaPuzzle();
+    startBananaTimer();
+}
+
+function startBananaTimer() {
+    clearInterval(bananaState.timerInterval);
+    bananaState.timerInterval = setInterval(() => {
+        bananaState.timeLeft--;
+        dom.bananaTimerDisplay.textContent = bananaState.timeLeft;
+        setTimerRing(bananaState.timeLeft, bananaState.totalTime);
+
+        if (bananaState.timeLeft <= 0) {
+            clearInterval(bananaState.timerInterval);
+            endBananaGame();
+        }
+    }, 1000);
+}
+
+function fetchBananaPuzzle() {
+    // Show loading, hide old image
+    dom.bananaPuzzleImg.style.opacity = '0';
+    dom.puzzleLoading.classList.remove('hidden');
+    dom.bananaAnswerInput.value = '';
+    dom.bananaAnswerInput.disabled = true;
+    dom.bananaSubmitBtn.disabled = true;
+
+    // Use a CORS proxy-free approach: fetch JSON from Banana API
+    fetch('https://marcconrad.com/uob/banana/api.php?out=json')
+        .then(res => res.json())
+        .then(data => {
+            // data.question = image URL, data.solution = answer digit
+            bananaState.currentSolution = String(data.solution);
+            dom.bananaPuzzleImg.src = data.question;
+            dom.bananaPuzzleImg.onload = () => {
+                dom.puzzleLoading.classList.add('hidden');
+                dom.bananaPuzzleImg.style.opacity = '1';
+                dom.bananaAnswerInput.disabled = false;
+                dom.bananaSubmitBtn.disabled = false;
+                dom.bananaAnswerInput.focus();
+            };
+            dom.bananaPuzzleImg.onerror = () => {
+                // Fallback: if image fails still enable input
+                dom.puzzleLoading.textContent = 'Puzzle image loaded!';
+                dom.puzzleLoading.classList.add('hidden');
+                dom.bananaAnswerInput.disabled = false;
+                dom.bananaSubmitBtn.disabled = false;
+            };
+        })
+        .catch(() => {
+            dom.puzzleLoading.textContent = 'Failed to load puzzle. Retrying...';
+            setTimeout(fetchBananaPuzzle, 2000);
+        });
+}
+
+function showBananaFeedback(correct) {
+    const el = correct ? dom.bananaFeedbackCorrect : dom.bananaFeedbackWrong;
+    const other = correct ? dom.bananaFeedbackWrong : dom.bananaFeedbackCorrect;
+    other.classList.add('hidden');
+    el.classList.remove('hidden');
+    el.classList.remove('feedback-animate');
+    // Trigger reflow for re-animation
+    void el.offsetWidth;
+    el.classList.add('feedback-animate');
+    setTimeout(() => el.classList.add('hidden'), 1500);
+}
+
+function checkBananaAnswer() {
+    const inputVal = dom.bananaAnswerInput.value.trim();
+    if (inputVal === '') return;
+
+    if (inputVal === bananaState.currentSolution) {
+        // Correct!
+        bananaState.score += 10;
+        bananaState.puzzlesSolved++;
+        dom.bananaScoreDisplay.textContent = bananaState.score;
+        dom.bananaPuzzlesCount.textContent = bananaState.puzzlesSolved;
+        showBananaFeedback(true);
+        // Load next puzzle after short delay
+        setTimeout(() => fetchBananaPuzzle(), 600);
+    } else {
+        // Wrong – clear input, no penalty
+        showBananaFeedback(false);
+        dom.bananaAnswerInput.value = '';
+        dom.bananaAnswerInput.focus();
+    }
+}
+
+function endBananaGame() {
+    dom.bananaAnswerInput.disabled = true;
+    dom.bananaSubmitBtn.disabled = true;
+    dom.bananaEndScore.textContent = bananaState.score;
+    dom.bananaEndPuzzles.textContent = bananaState.puzzlesSolved;
+    dom.bananaEndModal.classList.remove('hidden');
+}
+
+// Banana event listeners
+dom.bananaSubmitBtn.addEventListener('click', checkBananaAnswer);
+
+dom.bananaAnswerInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') checkBananaAnswer();
+});
+
+dom.bananaBackBtn.addEventListener('click', () => {
+    clearInterval(bananaState.timerInterval);
+    dom.bananaEndModal.classList.add('hidden');
+    showView('level');
+});
+
+dom.bananaPlayAgainBtn.addEventListener('click', () => {
+    dom.bananaEndModal.classList.add('hidden');
+    startBananaGame(bananaState.levelKey);
+});
+
+dom.bananaEndBackBtn.addEventListener('click', () => {
+    dom.bananaEndModal.classList.add('hidden');
+    clearInterval(bananaState.timerInterval);
     showView('level');
 });

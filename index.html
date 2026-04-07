@@ -118,6 +118,60 @@
             </div>
         </section>
 
+        <!-- BANANA ARITHMETIC VIEW -->
+        <section id="view-banana" class="view hidden">
+            <div class="banana-game-wrapper">
+                <!-- Top Bar -->
+                <div class="banana-top-bar">
+                    <button id="banana-back-btn" class="btn banana-back-btn">&#8592; Back</button>
+                    <div class="banana-level-badge" id="banana-level-label">Junior Banana</div>
+                    <div class="banana-score-box">
+                        <span class="banana-score-label">Score</span>
+                        <span id="banana-score-display">0</span>
+                    </div>
+                </div>
+
+                <!-- Timer Ring -->
+                <div class="banana-timer-container">
+                    <svg class="timer-ring" viewBox="0 0 120 120">
+                        <circle class="timer-ring-bg" cx="60" cy="60" r="52"/>
+                        <circle class="timer-ring-fill" id="timer-ring-circle" cx="60" cy="60" r="52"/>
+                    </svg>
+                    <div class="timer-inner">
+                        <span id="banana-timer-display">100</span>
+                        <span class="timer-unit">sec</span>
+                    </div>
+                </div>
+
+                <!-- Puzzle Card -->
+                <div class="banana-puzzle-card">
+                    <div class="puzzle-img-wrapper">
+                        <img id="banana-puzzle-img" src="" alt="Banana arithmetic puzzle" />
+                        <div id="puzzle-loading" class="puzzle-loading">Loading puzzle...</div>
+                    </div>
+                    <div class="puzzle-answer-row">
+                        <input type="number" id="banana-answer-input" class="banana-answer-input" placeholder="?" min="0" max="9" autocomplete="off" />
+                        <button id="banana-submit-btn" class="btn banana-submit-btn">Submit</button>
+                    </div>
+                </div>
+
+                <!-- Feedback Overlays -->
+                <div id="banana-feedback-correct" class="banana-feedback correct-feedback hidden">
+                    <span class="feedback-emoji">&#127820;</span>
+                    <span class="feedback-text">Correct! +10</span>
+                </div>
+                <div id="banana-feedback-wrong" class="banana-feedback wrong-feedback hidden">
+                    <span class="feedback-emoji">&#10060;</span>
+                    <span class="feedback-text">Try Again!</span>
+                </div>
+
+                <!-- Puzzles Solved Counter -->
+                <div class="banana-stats-row">
+                    <span>Puzzles Solved: <strong id="banana-puzzles-count">0</strong></span>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- Win Modal Popup -->
@@ -125,7 +179,29 @@
         <div class="glass-panel text-center popup-content">
             <h2 class="highlight-title popup-title">CONGRATULATIONS!</h2>
             <p id="win-message" class="popup-text">You completed the level.</p>
-            <button id="win-ok-btn" class="btn primary-btn btn-large">OK</button>
+            <button id="win-ok-btn" class="btn primary-btn btn-large">&#127820; Start Banana Arithmetic!</button>
+        </div>
+    </div>
+
+    <!-- Banana End-of-Round Modal -->
+    <div id="banana-end-modal" class="modal-overlay hidden">
+        <div class="glass-panel text-center popup-content banana-end-popup">
+            <div class="banana-end-icon">&#127820;</div>
+            <h2 class="highlight-title popup-title">Time's Up!</h2>
+            <div class="banana-end-stats">
+                <div class="stat-chip">
+                    <span class="stat-label">Final Score</span>
+                    <span class="stat-value" id="banana-end-score">0</span>
+                </div>
+                <div class="stat-chip">
+                    <span class="stat-label">Puzzles Solved</span>
+                    <span class="stat-value" id="banana-end-puzzles">0</span>
+                </div>
+            </div>
+            <div class="banana-end-buttons">
+                <button id="banana-play-again-btn" class="btn primary-btn btn-large">&#128257; Play Again</button>
+                <button id="banana-end-back-btn" class="btn secondary-btn btn-large">&#8592; Back</button>
+            </div>
         </div>
     </div>
 

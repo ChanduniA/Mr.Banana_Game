@@ -548,3 +548,396 @@ p {
     from { text-shadow: 0 0 10px rgba(252, 226, 5, 0.5); }
     to { text-shadow: 0 0 20px rgba(252, 226, 5, 1), 0 0 30px rgba(252, 226, 5, 0.8); }
 }
+
+/* =============================================
+   BANANA ARITHMETIC GAME STYLES
+   ============================================= */
+
+#view-banana {
+    width: 100%;
+    max-width: 700px;
+    padding: 0 10px;
+}
+
+.banana-game-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    padding-bottom: 20px;
+}
+
+/* Top Bar */
+.banana-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 14px 20px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--glass-shadow);
+}
+
+.banana-back-btn {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 9px 18px;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.banana-back-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateX(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.banana-level-badge {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(252,226,5,0.5);
+    text-transform: uppercase;
+}
+
+.banana-score-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.banana-score-label {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#banana-score-display {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    line-height: 1;
+    text-shadow: 0 0 12px rgba(252,226,5,0.6);
+    transition: transform 0.2s ease;
+}
+
+/* Countdown Timer Ring */
+.banana-timer-container {
+    position: relative;
+    width: 130px;
+    height: 130px;
+}
+
+.timer-ring {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.timer-ring-bg {
+    fill: none;
+    stroke: rgba(255,255,255,0.1);
+    stroke-width: 8;
+}
+
+.timer-ring-fill {
+    fill: none;
+    stroke: #2ecc71;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 326.72; /* 2 * PI * 52, set via JS too */
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear, stroke 0.5s ease;
+}
+
+.timer-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+}
+
+#banana-timer-display {
+    display: block;
+    font-size: 2rem;
+    font-weight: 800;
+    color: white;
+    line-height: 1;
+}
+
+.timer-unit {
+    font-size: 0.75rem;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Puzzle Card */
+.banana-puzzle-card {
+    width: 100%;
+    max-width: 560px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: var(--glass-shadow), 0 0 30px rgba(252,226,5,0.1);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.puzzle-img-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: rgba(0,0,0,0.2);
+}
+
+#banana-puzzle-img {
+    max-width: 100%;
+    max-height: 260px;
+    border-radius: 12px;
+    transition: opacity 0.4s ease;
+    display: block;
+}
+
+.puzzle-loading {
+    position: absolute;
+    color: rgba(255,255,255,0.7);
+    font-size: 1rem;
+    font-weight: 600;
+    animation: pulseOpacity 1.2s infinite;
+}
+
+@keyframes pulseOpacity {
+    0%, 100% { opacity: 0.5; }
+    50%       { opacity: 1; }
+}
+
+.puzzle-answer-row {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
+}
+
+.banana-answer-input {
+    width: 100px;
+    height: 60px;
+    font-size: 2rem;
+    font-weight: 800;
+    text-align: center;
+    border: 2.5px solid rgba(252, 226, 5, 0.5);
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.35);
+    color: var(--primary-color);
+    outline: none;
+    transition: all 0.3s ease;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.banana-answer-input::-webkit-inner-spin-button,
+.banana-answer-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.banana-answer-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 18px rgba(252, 226, 5, 0.45);
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.banana-answer-input:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.banana-submit-btn {
+    padding: 14px 30px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-color), #ffb300);
+    color: var(--text-dark);
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(252, 226, 5, 0.45);
+    transition: all 0.3s ease;
+}
+
+.banana-submit-btn:hover:not(:disabled) {
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 8px 25px rgba(252, 226, 5, 0.65);
+}
+
+.banana-submit-btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+}
+
+.banana-submit-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* Feedback Banners */
+.banana-feedback {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    border-radius: 50px;
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.6) translateY(20px);
+    transition: none;
+}
+
+.banana-feedback.feedback-animate {
+    animation: feedbackPop 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.correct-feedback {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.35), rgba(0, 180, 80, 0.25));
+    border: 2px solid rgba(46, 204, 113, 0.7);
+    color: #2ecc71;
+    box-shadow: 0 0 30px rgba(46, 204, 113, 0.4);
+}
+
+.wrong-feedback {
+    background: linear-gradient(135deg, rgba(255, 77, 77, 0.35), rgba(200, 0, 0, 0.2));
+    border: 2px solid rgba(255, 77, 77, 0.7);
+    color: #ff6b6b;
+    box-shadow: 0 0 30px rgba(255, 77, 77, 0.4);
+}
+
+.feedback-emoji {
+    font-size: 1.8rem;
+}
+
+.feedback-text {
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+@keyframes feedbackPop {
+    0%   { opacity: 0; transform: scale(0.6) translateY(20px); }
+    20%  { opacity: 1; transform: scale(1.1) translateY(-4px); }
+    45%  { transform: scale(1) translateY(0); }
+    75%  { opacity: 1; }
+    100% { opacity: 0; transform: scale(0.95) translateY(-10px); }
+}
+
+/* Stats Row */
+.banana-stats-row {
+    font-size: 1.05rem;
+    opacity: 0.8;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+#banana-puzzles-count {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+/* Banana End-of-Round Modal */
+.banana-end-popup {
+    max-width: 420px;
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 0 50px rgba(252, 226, 5, 0.35), 0 0 0 1px rgba(252,226,5,0.1);
+}
+
+.banana-end-icon {
+    font-size: 3.5rem;
+    margin-bottom: 5px;
+    animation: bounceIcon 1.2s infinite;
+}
+
+@keyframes bounceIcon {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-10px); }
+}
+
+.banana-end-stats {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.stat-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: rgba(252, 226, 5, 0.12);
+    border: 1.5px solid rgba(252, 226, 5, 0.35);
+    border-radius: 16px;
+    padding: 14px 28px;
+    min-width: 120px;
+}
+
+.stat-label {
+    font-size: 0.78rem;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat-value {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    text-shadow: 0 0 12px rgba(252,226,5,0.5);
+    line-height: 1;
+}
+
+.banana-end-buttons {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+/* Responsive Banana */
+@media (max-width: 520px) {
+    .banana-top-bar { padding: 10px 12px; }
+    .banana-level-badge { font-size: 0.9rem; }
+    #banana-score-display { font-size: 1.4rem; }
+    .banana-timer-container { width: 100px; height: 100px; }
+    #banana-timer-display { font-size: 1.6rem; }
+    .banana-puzzle-card { padding: 16px; }
+    .banana-answer-input { width: 80px; height: 54px; font-size: 1.6rem; }
+    .banana-submit-btn { padding: 12px 20px; font-size: 1rem; }
+    .stat-chip { padding: 10px 18px; min-width: 90px; }
+    .stat-value { font-size: 2rem; }
+}
