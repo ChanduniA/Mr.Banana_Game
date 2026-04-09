@@ -2,7 +2,7 @@
 // Initialize EmailJS
 emailjs.init("TR8mvTaOb-IbCfdcT");
 
-const mockUsers = {}; // Mock DB to store user: { pass, email }
+// NOTE: mockUsers replaced by Firestore — accounts now persist across sessions
 const FRUITS = ['🍌', '🍎', '🍊', '🍇', '🍓', '🍉', '🍍', '🍒', '🍑', '🥭', '🥝', '🥥', '🍋', '🍐', '🍈'];
 
 // Banana Arithmetic Config
@@ -55,7 +55,8 @@ const views = {
     otp: document.getElementById('view-otp'),
     level: document.getElementById('view-level'),
     game: document.getElementById('view-game'),
-    banana: document.getElementById('view-banana')
+    banana: document.getElementById('view-banana'),
+    leaderboard: document.getElementById('view-leaderboard')
 };
 
 const dom = {
@@ -112,7 +113,17 @@ const dom = {
     bananaEndScore: document.getElementById('banana-end-score'),
     bananaEndPuzzles: document.getElementById('banana-end-puzzles'),
     bananaPlayAgainBtn: document.getElementById('banana-play-again-btn'),
-    bananaEndBackBtn: document.getElementById('banana-end-back-btn')
+    bananaEndBackBtn: document.getElementById('banana-end-back-btn'),
+
+    // Leaderboard DOM
+    leaderboardBtn: document.getElementById('leaderboard-btn'),
+    leaderboardBackBtn: document.getElementById('leaderboard-back-btn'),
+    lbLoading: document.getElementById('lb-loading'),
+    lbEmpty: document.getElementById('lb-empty'),
+    lbTable: document.getElementById('lb-table'),
+    lbTbody: document.getElementById('lb-tbody'),
+    lbTabs: document.querySelectorAll('.lb-tab'),
+    lbFilterBtns: document.querySelectorAll('.lb-filter-btn')
 };
 
 // Helper: Switch Views
@@ -161,84 +172,112 @@ dom.authForm.addEventListener('submit', (e) => {
     }
 });
 
-function handleRegister() {
+async function handleRegister() {
     const email = dom.playerEmailInput.value.trim();
     const name = dom.playerNameInput.value.trim();
     const pass = dom.playerPasswordInput.value.trim();
-    if (name !== "" && pass !== "" && email !== "") {
-        if (mockUsers[name]) {
-            dom.authMessage.textContent = "Username already exists.";
-            dom.authMessage.style.color = "var(--danger-color)";
-            dom.authMessage.classList.remove('hidden');
-            setTimeout(() => dom.authMessage.classList.add('hidden'), 2000);
+    if (!name || !pass || !email) return;
+
+    dom.mainAuthBtn.disabled = true;
+    dom.authMessage.textContent = 'Checking...';
+    dom.authMessage.style.color = '#fce205';
+    dom.authMessage.classList.remove('hidden');
+
+    try {
+        // Check if username already taken in Firestore
+        const userDoc = await db.collection('users').doc(name).get();
+        if (userDoc.exists) {
+            dom.authMessage.textContent = 'Username already exists.';
+            dom.authMessage.style.color = 'var(--danger-color)';
+            setTimeout(() => dom.authMessage.classList.add('hidden'), 2500);
         } else {
-            mockUsers[name] = { pass: pass, email: email };
-            dom.authMessage.textContent = "Account registered! Switching to login...";
-            dom.authMessage.style.color = "#2ecc71";
-            dom.authMessage.classList.remove('hidden');
+            // Save new user to Firestore
+            await db.collection('users').doc(name).set({
+                name: name,
+                email: email,
+                password: pass,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            dom.authMessage.textContent = 'Account registered! Switching to login...';
+            dom.authMessage.style.color = '#2ecc71';
             setTimeout(() => {
                 isRegisterMode = false;
-                dom.authTitle.textContent = "Welcome to the Game";
-                dom.authSubtitle.textContent = "Please enter your name to start playing!";
-                dom.mainAuthBtn.textContent = "Login";
-                dom.authToggleText.textContent = "No account? Register here";
+                dom.authTitle.textContent = 'Welcome to the Game';
+                dom.authSubtitle.textContent = 'Please enter your name to start playing!';
+                dom.mainAuthBtn.textContent = 'Login';
+                dom.authToggleText.textContent = 'No account? Register here';
                 dom.playerEmailInput.classList.add('hidden');
                 dom.playerNameInput.value = name;
                 dom.playerPasswordInput.value = pass;
                 dom.authMessage.classList.add('hidden');
             }, 1000);
         }
+    } catch (err) {
+        console.error('Register error:', err);
+        dom.authMessage.textContent = 'Error saving account. Try again.';
+        dom.authMessage.style.color = 'var(--danger-color)';
+        setTimeout(() => dom.authMessage.classList.add('hidden'), 3000);
+    } finally {
+        dom.mainAuthBtn.disabled = false;
     }
 }
 
-function handleAuth() {
+async function handleAuth() {
     const name = dom.playerNameInput.value.trim();
     const pass = dom.playerPasswordInput.value.trim();
-    if (name && pass) {
-        if (mockUsers[name] && mockUsers[name].pass === pass) {
-            state.player = name;
-            
-            // Generate Mock OTP
-            state.expectedOTP = Math.floor(1000 + Math.random() * 9000).toString();
-            
-            // Show sending message to prevent rapid clicks
-            dom.authMessage.textContent = "Sending real OTP email...";
-            dom.authMessage.style.color = "#2ecc71";
-            dom.authMessage.classList.remove('hidden');
+    if (!name || !pass) return;
 
-            const templateParams = {
-                otp_code: state.expectedOTP,
-                user_email: mockUsers[name].email,
-                to_name: name
-            };
+    dom.mainAuthBtn.disabled = true;
+    dom.authMessage.textContent = 'Checking credentials...';
+    dom.authMessage.style.color = '#fce205';
+    dom.authMessage.classList.remove('hidden');
 
-            emailjs.send('service_hkoai68', 'template_aifkfos', templateParams)
-                .then(function(response) {
-                    console.log('SUCCESS!', response.status, response.text);
-                    // Show OTP View
-                    showView('otp');
-                    
-                    // Clear inputs securely
-                    dom.playerNameInput.value = "";
-                    dom.playerPasswordInput.value = "";
-                    dom.authMessage.classList.add('hidden');
-                    
-                    // Clear prior OTP boxes
-                    dom.otpBoxes.forEach(box => box.value = '');
-                    dom.otpMessage.classList.add('hidden');
-                }, function(error) {
-                    console.log('FAILED...', error);
-                    dom.authMessage.textContent = "Failed to send email. Try again.";
-                    dom.authMessage.style.color = "var(--danger-color)";
-                    setTimeout(() => dom.authMessage.classList.add('hidden'), 3000);
-                });
-
-        } else {
-            dom.authMessage.textContent = "invalid login";
-            dom.authMessage.style.color = "var(--danger-color)";
-            dom.authMessage.classList.remove('hidden');
-            setTimeout(() => dom.authMessage.classList.add('hidden'), 2000);
+    try {
+        // Fetch user from Firestore
+        const userDoc = await db.collection('users').doc(name).get();
+        if (!userDoc.exists || userDoc.data().password !== pass) {
+            dom.authMessage.textContent = 'Invalid username or password.';
+            dom.authMessage.style.color = 'var(--danger-color)';
+            setTimeout(() => dom.authMessage.classList.add('hidden'), 2500);
+            dom.mainAuthBtn.disabled = false;
+            return;
         }
+
+        // Credentials valid — store email for OTP, send via EmailJS
+        state.player = name;
+        state.playerEmail = userDoc.data().email;
+        state.expectedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+
+        dom.authMessage.textContent = 'Sending OTP email...';
+        dom.authMessage.style.color = '#2ecc71';
+
+        const templateParams = {
+            otp_code: state.expectedOTP,
+            user_email: state.playerEmail,
+            to_name: name
+        };
+
+        emailjs.send('service_hkoai68', 'template_aifkfos', templateParams)
+            .then(() => {
+                showView('otp');
+                dom.playerNameInput.value = '';
+                dom.playerPasswordInput.value = '';
+                dom.authMessage.classList.add('hidden');
+                dom.otpBoxes.forEach(box => box.value = '');
+                dom.otpMessage.classList.add('hidden');
+            }, (error) => {
+                console.error('EmailJS error:', error);
+                dom.authMessage.textContent = 'Failed to send email. Try again.';
+                dom.authMessage.style.color = 'var(--danger-color)';
+                setTimeout(() => dom.authMessage.classList.add('hidden'), 3000);
+            });
+    } catch (err) {
+        console.error('Login error:', err);
+        dom.authMessage.textContent = 'Login error. Check your connection.';
+        dom.authMessage.style.color = 'var(--danger-color)';
+        setTimeout(() => dom.authMessage.classList.add('hidden'), 3000);
+    } finally {
+        dom.mainAuthBtn.disabled = false;
     }
 }
 
@@ -388,6 +427,8 @@ function disableCards() {
 
     // Check for win
     if (state.matchedPairs === state.currentLevel.pairs) {
+        // Save flip card score to Firestore
+        saveScore('flipcard', state.currentLevelKey, state.score);
         setTimeout(() => {
             dom.winMessage.innerHTML = `${state.currentLevel.title}<br>
             <span style="margin-top: 15px; display: inline-block; font-size: 1.3rem; color: var(--primary-color); font-weight: bold;">Score : ${state.score}</span><br>
@@ -597,6 +638,8 @@ function endBananaGame() {
     dom.bananaEndScore.textContent = bananaState.score;
     dom.bananaEndPuzzles.textContent = bananaState.puzzlesSolved;
     dom.bananaEndModal.classList.remove('hidden');
+    // Save banana score to Firestore
+    saveScore('banana', bananaState.levelKey, bananaState.score, { puzzlesSolved: bananaState.puzzlesSolved });
 }
 
 // Banana event listeners
@@ -621,4 +664,122 @@ dom.bananaEndBackBtn.addEventListener('click', () => {
     dom.bananaEndModal.classList.add('hidden');
     clearInterval(bananaState.timerInterval);
     showView('level');
+});
+
+// ========== FIRESTORE HELPERS ==========
+
+// Save score to Firestore
+function saveScore(gameType, level, score, extra = {}) {
+    if (!state.player) return;
+    db.collection('scores').add({
+        playerName: state.player,
+        gameType: gameType,
+        level: level,
+        score: score,
+        puzzlesSolved: extra.puzzlesSolved || 0,
+        playedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(err => console.error('Error saving score:', err));
+}
+
+// ========== LEADERBOARD ==========
+
+let lbCurrentGame = 'flipcard';
+let lbCurrentLevel = 'all';
+
+function openLeaderboard() {
+    lbCurrentGame = 'flipcard';
+    lbCurrentLevel = 'all';
+    // Reset UI
+    dom.lbTabs.forEach(t => t.classList.remove('active'));
+    document.getElementById('lb-tab-flipcard').classList.add('active');
+    dom.lbFilterBtns.forEach(b => b.classList.remove('active'));
+    document.querySelector('.lb-filter-btn[data-level="all"]').classList.add('active');
+    showView('leaderboard');
+    loadLeaderboard();
+}
+
+async function loadLeaderboard() {
+    dom.lbLoading.classList.remove('hidden');
+    dom.lbLoading.textContent = 'Loading scores...';
+    dom.lbEmpty.classList.add('hidden');
+    dom.lbTable.classList.add('hidden');
+    dom.lbTbody.innerHTML = '';
+
+    try {
+        // Simple query — no composite index needed
+        // Fetch top 200 by score, then filter client-side
+        const snapshot = await db.collection('scores')
+            .orderBy('score', 'desc')
+            .limit(200)
+            .get();
+
+        dom.lbLoading.classList.add('hidden');
+
+        // Filter by current game type and level
+        let scores = [];
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            if (d.gameType !== lbCurrentGame) return;
+            if (lbCurrentLevel !== 'all' && d.level !== lbCurrentLevel) return;
+            scores.push(d);
+        });
+
+        // Re-sort after filtering & take top 10
+        scores.sort((a, b) => b.score - a.score);
+        scores = scores.slice(0, 10);
+
+        if (scores.length === 0) {
+            dom.lbEmpty.classList.remove('hidden');
+            return;
+        }
+
+        const rankMedals = ['🥇', '🥈', '🥉'];
+        scores.forEach((d, i) => {
+            const rank = i + 1;
+            const isMe = d.playerName === state.player;
+            const date = d.playedAt ? d.playedAt.toDate().toLocaleDateString() : '-';
+            const levelLabel = { easy: 'Easy', medium: 'Medium', hard: 'Hard' }[d.level] || d.level;
+            const rankDisplay = rank <= 3 ? rankMedals[rank - 1] : `#${rank}`;
+
+            const tr = document.createElement('tr');
+            if (isMe) tr.classList.add('lb-my-row');
+            tr.innerHTML = `
+                <td class="lb-rank">${rankDisplay}</td>
+                <td class="lb-player">${isMe ? '⭐ ' : ''}${d.playerName}</td>
+                <td class="lb-score">${d.score}</td>
+                <td class="lb-level">${levelLabel}</td>
+                <td class="lb-date">${date}</td>
+            `;
+            dom.lbTbody.appendChild(tr);
+        });
+
+        dom.lbTable.classList.remove('hidden');
+    } catch (err) {
+        console.error('Leaderboard error:', err);
+        dom.lbLoading.classList.remove('hidden');
+        dom.lbLoading.textContent = 'Failed to load scores. Please try again.';
+    }
+}
+
+// Leaderboard event listeners
+dom.leaderboardBtn.addEventListener('click', openLeaderboard);
+
+dom.leaderboardBackBtn.addEventListener('click', () => showView('level'));
+
+dom.lbTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        dom.lbTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        lbCurrentGame = tab.dataset.game;
+        loadLeaderboard();
+    });
+});
+
+dom.lbFilterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        dom.lbFilterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        lbCurrentLevel = btn.dataset.level;
+        loadLeaderboard();
+    });
 });

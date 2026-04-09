@@ -5,16 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mr. Banana Memory Game</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <!-- Firebase Compat SDK (works without npm/bundler) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="../backend/firebase-config.js"></script>
 </head>
 
 <body>
     <div class="background-overlay"></div>
 
     <header class="app-header">
-        <img src="logo.png" alt="Mr. Banana Logo" class="logo">
+        <img src="assets/logo.png" alt="Mr. Banana Logo" class="logo">
         <h1 class="highlight-title">Mr. Banana</h1>
     </header>
 
@@ -85,8 +89,11 @@
                         <span class="btn-title">Professor Banana</span>
                     </button>
                 </div>
-                <!-- Adding Logout Button here -->
-                <button id="level-logout-btn" class="btn danger-btn" style="margin-top: 25px;">Logout</button>
+                <!-- Leaderboard & Logout Buttons -->
+                <div style="display: flex; gap: 12px; margin-top: 25px; justify-content: center;">
+                    <button id="leaderboard-btn" class="btn leaderboard-open-btn">&#127942; Leaderboard</button>
+                    <button id="level-logout-btn" class="btn danger-btn">Logout</button>
+                </div>
             </div>
         </section>
 
@@ -172,6 +179,50 @@
             </div>
         </section>
 
+        <!-- LEADERBOARD VIEW -->
+        <section id="view-leaderboard" class="view hidden">
+            <div class="lb-wrapper">
+                <!-- Top Bar -->
+                <div class="lb-top-bar">
+                    <button id="leaderboard-back-btn" class="btn banana-back-btn">&#8592; Back</button>
+                    <h2 class="lb-title">&#127942; Leaderboard</h2>
+                    <div style="width: 90px;"></div>
+                </div>
+
+                <!-- Game Tabs -->
+                <div class="lb-tabs">
+                    <button class="lb-tab active" id="lb-tab-flipcard" data-game="flipcard">&#127183; Flip Card</button>
+                    <button class="lb-tab" id="lb-tab-banana" data-game="banana">&#127820; Banana</button>
+                </div>
+
+                <!-- Level Filter -->
+                <div class="lb-filter">
+                    <button class="lb-filter-btn active" data-level="all">All</button>
+                    <button class="lb-filter-btn" data-level="easy">Easy</button>
+                    <button class="lb-filter-btn" data-level="medium">Medium</button>
+                    <button class="lb-filter-btn" data-level="hard">Hard</button>
+                </div>
+
+                <!-- Scores Table -->
+                <div class="lb-table-wrapper">
+                    <div id="lb-loading" class="lb-loading">Loading scores...</div>
+                    <div id="lb-empty" class="lb-empty hidden">No scores yet. Be the first! &#127820;</div>
+                    <table class="lb-table hidden" id="lb-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Player</th>
+                                <th>Score</th>
+                                <th>Level</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lb-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- Win Modal Popup -->
@@ -205,7 +256,7 @@
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script src="js/app.js"></script>
 </body>
 
 </html>
