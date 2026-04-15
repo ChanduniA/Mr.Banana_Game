@@ -144,6 +144,7 @@ function showView(viewName) {
 let isRegisterMode = false;
 
 dom.authToggleText.addEventListener('click', () => {
+    SoundEngine.click();
     isRegisterMode = !isRegisterMode;
     if (isRegisterMode) {
         dom.authTitle.textContent = "Register now";
@@ -164,6 +165,7 @@ dom.authToggleText.addEventListener('click', () => {
 });
 
 dom.authForm.addEventListener('submit', (e) => {
+    SoundEngine.click();
     e.preventDefault();
     if (isRegisterMode) {
         handleRegister();
@@ -298,6 +300,7 @@ dom.otpBoxes.forEach((box, index) => {
 });
 
 dom.verifyOtpBtn.addEventListener('click', () => {
+    SoundEngine.click();
     const enteredCode = dom.otpBoxes.map(box => box.value).join('');
     if (enteredCode === state.expectedOTP) {
         // Validation Passes
@@ -313,6 +316,7 @@ dom.verifyOtpBtn.addEventListener('click', () => {
 });
 
 dom.cancelOtpBtn.addEventListener('click', () => {
+    SoundEngine.click();
     state.player = null;
     state.expectedOTP = null;
     showView('auth');
@@ -321,6 +325,7 @@ dom.cancelOtpBtn.addEventListener('click', () => {
 // ----- Level Selection -----
 dom.levelButtons.forEach(btn => {
     btn.addEventListener('click', () => {
+        SoundEngine.click();
         const levelKey = btn.dataset.level;
         startGame(levelKey);
     });
@@ -388,6 +393,7 @@ function flipCard() {
     if (state.lockBoard) return;
     if (this === state.firstCard) return;
 
+    SoundEngine.flip(); // Play flip sound on every card flip
     this.classList.add('flip');
 
     if (!state.firstCard) {
@@ -469,7 +475,7 @@ function updateScore() {
 
 // ----- Game Controls -----
 dom.restartBtn.addEventListener('click', () => {
-    // Look like an explicit restart visually
+    SoundEngine.click();
     dom.cardGrid.style.opacity = 0;
     setTimeout(() => {
         initBoard();
@@ -478,10 +484,12 @@ dom.restartBtn.addEventListener('click', () => {
 });
 
 dom.backBtn.addEventListener('click', () => {
+    SoundEngine.click();
     showView('level');
 });
 
 dom.logoutBtn.addEventListener('click', () => {
+    SoundEngine.click();
     state.player = null;
     dom.playerNameInput.value = "";
     dom.playerPasswordInput.value = "";
@@ -490,6 +498,7 @@ dom.logoutBtn.addEventListener('click', () => {
 });
 
 dom.levelLogoutBtn.addEventListener('click', () => {
+    SoundEngine.click();
     state.player = null;
     dom.playerNameInput.value = "";
     dom.playerPasswordInput.value = "";
@@ -551,6 +560,7 @@ function startBananaGame(levelKey) {
 
 function startBananaTimer() {
     clearInterval(bananaState.timerInterval);
+    SoundEngine.tickStart(); // Start ticking when banana countdown begins
     bananaState.timerInterval = setInterval(() => {
         bananaState.timeLeft--;
         dom.bananaTimerDisplay.textContent = bananaState.timeLeft;
@@ -558,6 +568,7 @@ function startBananaTimer() {
 
         if (bananaState.timeLeft <= 0) {
             clearInterval(bananaState.timerInterval);
+            SoundEngine.tickStop(); // Stop ticking when time runs out
             endBananaGame();
         }
     }, 1000);
@@ -651,16 +662,19 @@ dom.bananaAnswerInput.addEventListener('keydown', (e) => {
 
 dom.bananaBackBtn.addEventListener('click', () => {
     clearInterval(bananaState.timerInterval);
+    SoundEngine.tickStop(); // Stop ticking when leaving banana game
     dom.bananaEndModal.classList.add('hidden');
     showView('level');
 });
 
 dom.bananaPlayAgainBtn.addEventListener('click', () => {
+    SoundEngine.tickStop(); // Stop any leftover tick before restarting
     dom.bananaEndModal.classList.add('hidden');
     startBananaGame(bananaState.levelKey);
 });
 
 dom.bananaEndBackBtn.addEventListener('click', () => {
+    SoundEngine.tickStop(); // Stop ticking when going back from end modal
     dom.bananaEndModal.classList.add('hidden');
     clearInterval(bananaState.timerInterval);
     showView('level');
@@ -762,12 +776,13 @@ async function loadLeaderboard() {
 }
 
 // Leaderboard event listeners
-dom.leaderboardBtn.addEventListener('click', openLeaderboard);
+dom.leaderboardBtn.addEventListener('click', () => { SoundEngine.click(); openLeaderboard(); });
 
-dom.leaderboardBackBtn.addEventListener('click', () => showView('level'));
+dom.leaderboardBackBtn.addEventListener('click', () => { SoundEngine.click(); showView('level'); });
 
 dom.lbTabs.forEach(tab => {
     tab.addEventListener('click', () => {
+        SoundEngine.click();
         dom.lbTabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
         lbCurrentGame = tab.dataset.game;
@@ -777,9 +792,15 @@ dom.lbTabs.forEach(tab => {
 
 dom.lbFilterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
+        SoundEngine.click();
         dom.lbFilterBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         lbCurrentLevel = btn.dataset.level;
         loadLeaderboard();
     });
+});
+
+// ----- Global Hover Sound on all buttons -----
+document.querySelectorAll('.btn, .auth-toggle-badge').forEach(btn => {
+    btn.addEventListener('mouseenter', () => SoundEngine.hover());
 });

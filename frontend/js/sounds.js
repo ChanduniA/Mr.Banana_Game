@@ -11,7 +11,7 @@ const SoundEngine = (() => {
         flip:   new Audio(BASE + 'Flip card sound.mp3'),
         click:  new Audio(BASE + 'Button click sound.mp3'),
         hover:  new Audio(BASE + 'hover sound.mp3'),
-        tick:   new Audio(BASE + 'Time Ticking Sound.mp3'),
+        tick:   new Audio(BASE + 'New Ticking Sound.mp3'),
     };
 
     // Set volume levels
@@ -26,7 +26,7 @@ const SoundEngine = (() => {
         const audio = sounds[key];
         if (!audio) return;
         audio.currentTime = 0;
-        audio.play().catch(() => {});
+        audio.play().catch(e => console.warn('[Sound] play failed for', key, e));
     }
 
     return {
@@ -35,8 +35,9 @@ const SoundEngine = (() => {
         hover:     () => play('hover'),
         tickStart: () => {
             if (muted) return;
+            console.log('[Sound] tickStart — playing New Ticking Sound.mp3');
             sounds.tick.currentTime = 0;
-            sounds.tick.play().catch(() => {});
+            sounds.tick.play().catch(e => console.warn('[Sound] tick failed:', e));
         },
         tickStop: () => {
             sounds.tick.pause();
@@ -44,7 +45,6 @@ const SoundEngine = (() => {
         },
         toggleMute: () => {
             muted = !muted;
-            // Mute/unmute the looping tick in real-time
             sounds.tick.muted = muted;
             return muted;
         },
